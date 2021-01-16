@@ -1,0 +1,31 @@
+---
+##################################
+# Iptables rules example:
+
+# iptables -N custom_chain
+# iptables -I INPUT -p tcp -m tcp --dport 80 -m comment --comment "jump to custom_chain" -j custom_chain
+# iptables -I custom_chain -s 127.0.0.0/24 -j ACCEPT -m comment --comment localhost -j ACCEPT
+# iptables -I custom_chain -s 147.135.182.86/32 -j ACCEPT -m comment --comment infra-vpn1 -j ACCEPT
+# iptables -I custom_chain -s 147.135.182.87/32 -j ACCEPT -m comment --comment infra-vpn2 -j ACCEPT
+# iptables -A custom_chain -j DROP
+##################################
+
+# ### Create custom iptables chains
+
+# custom_chain_list:
+#   - custom_chain
+
+# ### Add rules for custom iptables chains
+
+# iptables_rules:
+#   - { chain: INPUT, port: "80", jump_chain: custom_chain, comment: jump to custom_chain, ip: "{{ custom_chain_ip_list }}" }
+
+# ### Ip list for custom iptables chains
+
+# custom_chain_ip_list:
+#   - { ip: 127.0.0.0/24, comment: localhost }
+#   - { ip: 147.135.182.86/32, comment: infra-vpn1 }
+#   - { ip: 147.135.182.87/32, comment: infra-vpn2 }
+
+iptables_rules: []
+custom_chain_list: []

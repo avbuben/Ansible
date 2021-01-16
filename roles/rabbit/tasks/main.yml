@@ -1,0 +1,21 @@
+---
+
+- include: install-debian.yml
+  tags:
+    - rabbit
+    - rabbit_install
+
+
+- include: config.yml
+  when: env == "production" or env == "dev"
+  tags:
+    - rabbit
+    - rabbit_config
+    - rabbit_production_config
+
+
+- include: manage.yml
+  tags:
+    - rabbit
+    - rabbit_config
+    - rabbit_vhosts

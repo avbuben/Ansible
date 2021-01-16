@@ -1,0 +1,22 @@
+---
+
+- name: create directory for dkim
+  file:
+    path: /etc/exim4/dkim/
+    state: directory
+    owner: root
+    group: Debian-exim
+    mode: 0755
+
+- name: Copy dkim key files
+  copy:
+    content: "{{ item.file }}"
+    dest: "/etc/exim4/dkim/{{ item.file_name }}"
+    owner: Debian-exim
+    group: Debian-exim
+    mode: 0640
+  with_items:
+    - "{{ exim4_dkim }}"
+  notify:
+    - exim4 restart
+  no_log: true  ### hidden logs

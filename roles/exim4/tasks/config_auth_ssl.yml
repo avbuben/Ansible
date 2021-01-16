@@ -1,0 +1,59 @@
+---
+
+- name: Copy exim4 conf & enable auth_tls
+  template:
+    src: "{{ item.src }}.j2"
+    dest: "/etc/exim4/{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - src: update-exim4.conf.conf
+      dest: update-exim4.conf.conf
+    - src: exim4.conf.template.auth.tls
+      dest: exim4.conf.template
+  notify:
+    - exim4 restart
+
+- name: exim4 set custom port options
+  lineinfile:
+    path: /etc/default/exim4
+    regexp: "^SMTPLISTENEROPTIONS="
+    line: "SMTPLISTENEROPTIONS='-oX 465:25 -oP /var/run/exim4/exim.pid'"
+  notify:
+    - exim4 restart
+
+- name: Create directory for ssl certs
+  file:
+    path: "{{ exim4_tls_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  tags: certs
+
+- name: Copy ssl certs
+  copy:
+    content: "{{ item.file }}"
+    dest: "{{ exim4_tls_path }}/{{ item.file_name }}"
+    owner: root
+    group: Debian-exim
+    mode: 0640
+  with_items:
+    - "{{ exim4_tls_cert }}"
+  notify:
+    - exim4 restart
+  no_log: true  ### hidden logs
+  tags: certs
+
+- name: Copy exim4 passwd file
+  template:
+    src: "passwd.j2"
+    dest: "/etc/exim4/passwd"
+    owner: root
+    group: Debian-exim
+    mode: '0640'
+  when: 
+    - exim4_passwd is defined
+    - exim4_passwd|length > 0
+  no_log: true  ### hidden logs

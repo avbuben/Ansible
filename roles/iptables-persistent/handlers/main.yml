@@ -1,0 +1,5 @@
+---
+
+
+- name: iptables save
+  shell: /etc/init.d/netfilter-persistent save

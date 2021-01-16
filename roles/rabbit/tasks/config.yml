@@ -1,0 +1,76 @@
+---
+
+
+- name: Create ssl directory
+  file:
+    path: /etc/rabbitmq/ssl
+    state: directory
+    owner: 'rabbitmq'
+    group: 'rabbitmq'
+    mode: 0770
+
+
+- name: Copy ssl certificates
+  copy:
+    content: "{{ item.file }}"
+    dest: "/etc/rabbitmq/ssl/{{ item.file_name }}"
+    owner: 'rabbitmq'
+    group: 'rabbitmq'
+    mode: 0640
+  with_items:
+    - "{{ rabbitmq_ssl_ca }}"
+    - "{{ rabbitmq_ssl_crt }}"
+    - "{{ rabbitmq_ssl_key }}"
+  tags:
+    - certs
+
+
+- name: Copy ssl certificates for management
+  copy:
+    content: "{{ item.file }}"
+    dest: "/etc/rabbitmq/ssl/{{ item.file_name }}"
+    owner: 'rabbitmq'
+    group: 'rabbitmq'
+    mode: 0640
+  with_items:
+    - "{{ rabbitmq_management_ssl_crt }}"
+    - "{{ rabbitmq_management_ssl_key }}"
+  tags:
+    - certs
+
+
+- name: Push hosts to /etc/hosts
+  lineinfile:
+    dest: /etc/hosts
+    line: "{{ item.host_ip }} {{ item.host_name }}"
+  with_items:
+    - "{{ rabbitmq_cluster_hosts }}"
+
+
+- name: Configure sysctl.conf
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_items:
+    - "{{ sysctl_conf_list }}"
+  when: sysctl_conf_list is defined
+
+
+- name: Configure rabbitmq
+  template:
+    src: "{{ item.src }}.j2"
+    dest: "{{ item.dest }}"
+    backup: yes
+  with_items:
+    - { src: ".erlang.cookie", dest: "/var/lib/rabbitmq/.erlang.cookie" }
+    - { src: "rabbitmq.config", dest: "/etc/rabbitmq/rabbitmq.config" }
+    - { src: "rabbitmq-env.conf", dest: "/etc/rabbitmq/rabbitmq-env.conf" }
+  notify:
+    - rabbit restart
+
+# Flush handlers
+- meta: flush_handlers
+  become: true

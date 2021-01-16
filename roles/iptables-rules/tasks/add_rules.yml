@@ -1,0 +1,37 @@
+---
+
+- name: "{{ item.chain }} jump to {{ item.jump_chain }}"
+  iptables:
+    action: insert
+    chain: "{{ item.chain }}"
+    source: 0.0.0.0/0
+    protocol: tcp
+    comment: "{{ item.comment }}"
+    destination_port: "{{ item.port }}"
+    jump: "{{ item.jump_chain }}"
+    state:  "{{ state | default('present') }}"
+  become: yes
+  with_items:
+    - "{{ iptables_rules }}"
+  notify: iptables save
+
+- name: "{{ item[0].jump_chain }} ACCEPT"
+  iptables:
+    action: insert
+    chain: "{{ item[0].jump_chain }}"
+    source: "{{ item[1].ip }}"
+    comment: "{{ item[1].comment }}"
+    jump: "ACCEPT"
+  become: yes
+  loop: "{{ lookup('subelements', iptables_rules, 'ip', {'skip_missing': True}) }}"
+  notify: iptables save
+
+- name: "{{ item.jump_chain }} DROP"
+  iptables:
+    chain: "{{ item.jump_chain }}"
+    source: "0.0.0.0/0"
+    jump: "DROP"
+  become: yes
+  with_items:
+    - "{{ iptables_rules }}"
+  notify: iptables save

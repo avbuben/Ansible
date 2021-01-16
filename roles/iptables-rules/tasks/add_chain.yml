@@ -1,0 +1,11 @@
+---
+
+- name: create chain
+  become: yes
+  shell: iptables -N {{ item }}
+  failed_when: 'iptables_create_chain.failed and "Chain already exists" not in iptables_create_chain.stderr'
+  changed_when: 'iptables_create_chain.changed and not iptables_create_chain.failed'
+  register: iptables_create_chain
+  with_items:
+    - "{{ custom_chain_list }}"
+  notify: iptables save

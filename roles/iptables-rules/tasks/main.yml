@@ -1,0 +1,21 @@
+---
+
+
+- name: Install
+  become: yes
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - iptables-persistent
+  when: ansible_os_family == 'Debian'
+
+- import_tasks: add_сhain.yml
+  tags:
+    - iptables_rules
+  when: custom_chain_list is defined
+
+- import_tasks: add_rules.yml
+  tags:
+    - iptables_rules
+  when: iptables_rules is defined

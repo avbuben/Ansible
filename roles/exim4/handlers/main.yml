@@ -1,0 +1,7 @@
+---
+
+- name: exim4 restart
+  become: yes
+  systemd:
+    name: exim4
+    state: restarted

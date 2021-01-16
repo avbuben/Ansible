@@ -1,0 +1,3 @@
+{% for user in proftpd_users %}
+{{ user.username }}:{{ user.passwd_hash }}:{{ proftpd_main_uid }}:{{ proftpd_main_gid }}::{{ ftp_dir_path }}{{ user.dir | default (user.username) }}:/bin/false
+{% endfor %}

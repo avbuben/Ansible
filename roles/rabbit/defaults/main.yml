@@ -1,0 +1,38 @@
+---
+
+
+rabbit_node_name: "rabbit@{{ inventory_hostname }}"
+
+rabbitmq_vhosts:
+  - example_vhost
+  - /example_vhost2
+
+rabbitmq_version: 3.7.24-1
+
+# Rabbitmq host group in ansible inventory
+rabbitmq_cluster_group: example_group
+
+# Rabbit users
+rabbitmq_users:
+# User for example_vhost
+  - user:           "example_user"
+    password:       "example_password"
+    vhost:          "example_vhost"
+    configure_priv: ".*"
+    read_priv:      ".*"
+    write_priv:     ".*"
+    tags:           ""
+# User for /example_vhost2
+  - user:           "example_user"
+    password:       "example_password"
+    vhost:          "/example_vhost2"
+    configure_priv: ".*"
+    read_priv:      ".*"
+    write_priv:     ".*"
+    tags:           ""
+
+### /etc/hosts
+rabbitmq_cluster_hosts: []
+
+### /etc/sysctl.conf
+sysctl_conf_list: []

@@ -1,0 +1,72 @@
+---
+
+
+- name: Install base packages
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - apt-transport-https
+
+
+- name: Add Erlang Package Repository on Bintray Key
+  apt_key:
+    keyserver: hkps.pool.sks-keyservers.net
+    id: "0x6B73A36E6026DFCA"
+
+- name: Add Erlang Package Repository on Bintray
+  apt_repository:
+    repo: "{{ item.repo }}"
+    state: present
+    filename: "{{ item.file }}"
+  with_items:
+    - {file: "erlang-solutions", repo: "deb https://dl.bintray.com/rabbitmq-erlang/debian {{ ansible_distribution_release }} erlang"}
+
+
+- name: Pin erlang packages
+  template:
+    src: package-preferences.j2
+    dest: "/etc/apt/preferences.d/{{ item.dest }}"
+  with_items:
+    - { name: 'erlang*', release: 'Bintray', dest: 'erlang' }
+
+
+- name: Install esl-erlang
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - erlang-nox
+
+
+- name: ADD RabbitMQ repository key
+  apt_key:
+    keyserver: hkps.pool.sks-keyservers.net
+    id: "0x6B73A36E6026DFCA"
+
+
+- name: Add RabbitMQ repositories
+  apt_repository:
+    repo: "{{ item.repo }}"
+    state: present
+    filename: "{{ item.file }}"
+  with_items:
+    - {file: "rabbit", repo: "deb https://dl.bintray.com/rabbitmq/debian  {{ ansible_distribution_release }} main"}
+  tags:
+    - rabbit_add_apt
+
+
+- name: Install RabbitMQ
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    policy_rc_d: 101
+  with_items:
+    - rabbitmq-server={{ rabbitmq_version }}
+
+
+- name: Enable managment plugin for RabbitMQ
+  rabbitmq_plugin:
+    names: rabbitmq_management
+    state: enabled
+    new_only: yes

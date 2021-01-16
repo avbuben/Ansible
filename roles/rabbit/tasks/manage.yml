@@ -1,0 +1,37 @@
+---
+
+
+- name: Add vhosts for RabbitMQ
+  rabbitmq_vhost:
+    name: "{{ item }}"
+    state: present
+    node: "{{ rabbit_node_name }}"
+  with_items:
+    "{{ rabbitmq_vhosts }}"
+
+
+- name: Add users for RabbitMQ
+  rabbitmq_user:
+    user: "{{ item.user }}"
+    password: "{{ item.password }}"
+    vhost: "{{ item.vhost }}"
+    configure_priv: "{{ item.configure_priv }}"
+    write_priv: "{{ item.write_priv }}"
+    read_priv: "{{ item.read_priv }}"
+    tags: "{{ item.tags | default('') }}"
+    state: "{{ item.state | default('present') }}"
+  with_items:
+    "{{ rabbitmq_users }}"
+
+
+- name: Set HA policy
+  rabbitmq_policy:
+    node: "{{ rabbit_node_name }}"
+    vhost: "{{ item }}"
+    name: HA
+    pattern: .*
+    tags:
+      ha-mode: all
+      ha-sync-mode: automatic
+  with_items: "{{ rabbitmq_vhosts }}"
+  when: env == "production" or env == "dev"

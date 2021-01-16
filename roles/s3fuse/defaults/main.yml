@@ -1,0 +1,8 @@
+---
+# s3fuse_s3_bucket: test-bucket
+s3fuse_dir_path: /var/test_dir/
+s3fuse_mount_uid: 1010
+s3fuse_mount_gid: 1010
+
+aws_access_key: []
+aws_secret_key: []

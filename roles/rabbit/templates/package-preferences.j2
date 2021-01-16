@@ -1,0 +1,8 @@
+Package: {{ item.name }}
+{% if item.has_key('version') %}
+Pin: version {{ item.version }}
+{% endif %}
+{% if item.has_key('release') %}
+Pin: release o={{ item.release }}
+{% endif %}
+Pin-Priority: {{ item.priority | default('1000') }}

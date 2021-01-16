@@ -1,0 +1,108 @@
+---
+
+- name: Verify Ansible version
+  assert:
+    that:
+      - ansible_distribution == 'Debian'
+      - ansible_distribution_version >= '10'
+    msg: >
+      Your Linux distribution version not supported. Debian 10 only!
+
+- name: Install packages
+  become: yes
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - proftpd
+    - proftpd-mod-vroot
+    - ftp
+
+- name: Create main user
+  user:
+    name: "{{ proftpd_main_user }}"
+    uid: "{{ proftpd_main_uid }}"
+    password: "no"
+    shell: "/sbin/nologin"
+    system: "no"
+  become: true
+
+- name: Copy proftpd conf
+  become: yes
+  template:
+    src: '{{ item }}.j2'
+    dest: '/etc/proftpd/{{ item }}'
+    owner: root
+    group: root
+    mode: '0640'
+  with_items:
+    - proftpd.conf
+    - ftpd.passwd
+  notify:
+    - proftpd restart
+
+- name: copy proftpd_ssh_host_rsa_key
+  become: yes
+  copy:
+    content: "{{ proftpd_ssh_host_rsa_key }}"
+    dest: '/etc/proftpd/ssh_host_rsa_key'
+    owner: root
+    group: root
+    mode: '0600'
+  notify:
+    - proftpd restart
+  when:
+    - proftpd_ssh_host_rsa_key is defined
+    - proftpd_ssh_host_rsa_key|length > 0
+
+- name: Create dir auth keys
+  become: yes
+  file:
+    path: /etc/proftpd/authorized_keys
+    state: directory
+
+- name: generate users pub key
+  become: yes
+  template:
+    src: 'pub_key.j2'
+    dest: /etc/proftpd/authorized_keys/{{ item.username }}
+    owner: root
+    group: root
+    mode: '0644'
+  with_items: '{{ proftpd_users }}'
+  when: item.pub_keys is defined
+
+- name: Create ftp users dir
+  become: yes
+  file:
+    path: '{{ ftp_dir_path }}{{ item.dir | default (item.username) }}'
+    state: directory
+    owner: '{{ proftpd_main_user }}'
+    group: '{{ proftpd_main_user }}'
+  with_items: '{{ proftpd_users }}'
+
+- name: Copy proftpd logrotate file
+  become: yes
+  template:
+    src: '{{ item }}.j2'
+    dest: '/etc/logrotate.d/proftpd-basic'
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - proftpd.logrotate
+
+- name: Create log files
+  become: yes
+  copy:
+    content: ""
+    dest: '/var/log/proftpd/{{ item }}'
+    force: no
+    owner: root
+    group: root
+    mode: 0640
+  with_items:
+    - full.log
+    - proftpd.log
+    - sftp.log
+    - controls.log

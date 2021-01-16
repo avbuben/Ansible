@@ -1,0 +1,31 @@
+---
+
+- name: Install packages
+  become: yes
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - s3fs
+
+- name: Copy credentional templates
+  become: yes
+  template:
+    src: passwd-s3fs.j2
+    dest: /root/.passwd-s3fs
+    mode: '0600'
+
+- name: Create mount dir
+  become: yes
+  file:
+    path: "{{ s3fuse_dir_path }}"
+    state: directory
+
+- name: Mount up device by UUID
+  become: yes
+  mount:
+    path: "{{ s3fuse_dir_path }}"
+    src: s3fs#{{ s3fuse_s3_bucket }}
+    fstype: fuse
+    opts: _netdev,allow_other,uid={{ s3fuse_mount_uid }},gid={{ s3fuse_mount_gid }},nonempty
+    state: mounted

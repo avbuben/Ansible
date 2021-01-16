@@ -1,0 +1,27 @@
+---
+
+
+- name: Install
+  apt:
+    name: "{{ packages }}"
+    update_cache: yes
+    policy_rc_d: 101   ###  Чтобы не стартовал сервис после установки, требуется ansible > 2.8.0
+  vars:
+    packages:
+      - fail2ban
+
+- name: Autostart
+  systemd:
+    name: fail2ban
+    enabled: yes
+
+- name: Install
+  apt:
+    name: "{{ packages }}"
+    update_cache: yes
+  vars:
+    packages:
+      - python-systemd
+      - python3-systemd
+  when:
+    - ansible_distribution_release != 'jessie'

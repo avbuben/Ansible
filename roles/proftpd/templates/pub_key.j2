@@ -1,0 +1,5 @@
+{% for pub_key in item.pub_keys %}
+---- BEGIN SSH2 PUBLIC KEY ----
+Comment: "{{ item.username }}"
+{{ pub_key }}---- END SSH2 PUBLIC KEY ----
+{% endfor %}

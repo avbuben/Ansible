@@ -1,0 +1,18 @@
+---
+
+
+- name: "{{ iptables_chain }} {{ iptables_extra_args }} jump to {{ iptables_jump_to }} check"
+  become: yes
+  shell: "iptables -C {{ iptables_chain }} -m conntrack --ctstate DNAT {{ iptables_extra_args }} -j {{ iptables_jump_to }} -m comment --comment '{{ iptables_comment }}'"
+  register: iptables_exist
+  failed_when: 
+    - iptables_exist is failed
+    - iptables_exist.stderr not in ['iptables: No chain/target/match by that name.', 'iptables: Bad rule (does a matching rule exist in that chain?).']
+  changed_when:
+    - iptables_exist.stderr in ['iptables: No chain/target/match by that name.','iptables: Bad rule (does a matching rule exist in that chain?).']
+
+- name: "{{ iptables_chain }}  {{ iptables_extra_args }} jump to {{ iptables_jump_to }} add"
+  become: yes
+  shell: "iptables -I {{ iptables_chain }} {{ iptables_rule_number }} -m conntrack --ctstate DNAT {{ iptables_extra_args }} -j {{ iptables_jump_to }} -m comment --comment '{{ iptables_comment }}'"
+  when: iptables_exist is changed
+  notify: iptables save

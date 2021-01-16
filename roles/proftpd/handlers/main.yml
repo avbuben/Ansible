@@ -1,0 +1,7 @@
+---
+
+- name: proftpd restart
+  become: yes
+  systemd:
+    name: proftpd
+    state: restarted

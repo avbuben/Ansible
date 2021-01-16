@@ -1,0 +1,11 @@
+---
+
+
+- name: Install
+  become: yes
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - iptables-persistent
+  when: ansible_os_family == 'Debian'

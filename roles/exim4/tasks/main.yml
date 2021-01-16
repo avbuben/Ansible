@@ -1,0 +1,31 @@
+---
+
+
+- import_tasks: install.yml
+  tags:
+    - exim4
+    - exim4_install
+
+- import_tasks: config.yml
+  tags:
+    - exim4
+    - exim4_config
+  when:
+    - exim4_auth_tls is defined
+    - not exim4_auth_tls
+
+- import_tasks: config_auth_ssl.yml
+  tags:
+    - exim4
+    - exim4_config
+  when:
+    - exim4_auth_tls is defined
+    - exim4_auth_tls
+
+- import_tasks: dkim.yml
+  tags:
+    - exim4
+    - exim4_config
+  when:
+    - exim4_dkim is defined
+    - exim4_dkim|length > 0

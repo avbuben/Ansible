@@ -1,0 +1,14 @@
+---
+
+- name: Copy exim4 conf
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/exim4/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - update-exim4.conf.conf
+    - exim4.conf.template
+  notify:
+    - exim4 restart

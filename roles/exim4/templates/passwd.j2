@@ -1,0 +1,5 @@
+{% if exim4_passwd is defined %}
+{% for item in exim4_passwd %}
+{{ item.username }}:{{ item.password | string | password_hash('sha256') }}:{{ item.comment }}
+{% endfor %}
+{% endif %}

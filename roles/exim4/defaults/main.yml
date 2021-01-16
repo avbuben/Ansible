@@ -1,0 +1,44 @@
+---
+
+exim4_dc_eximconfig_configtype: 'internet'
+exim4_dc_other_hostnames: '{{ ansible_fqdn }}'
+exim4_dc_local_interfaces: '127.0.0.1'
+exim4_dc_readhost: ''
+exim4_dc_relay_domains: ''
+exim4_dc_relay_nets: ''
+exim4_queue_run_max: 5
+exim4_remote_max_parallel: 2
+exim4_smtp_accept_queue_per_connection: 10
+exim4_smtp_accept_max_per_connection: 1000
+exim4_smtp_accept_max_per_host: 10
+exim4_smtp_accept_max: 20
+exim4_fqdn_name: "{{ ansible_fqdn }}"
+exim4_disable_ipv6: true
+exim4_ignore_smtp_lenght_limit: true
+
+exim4_dkim: []
+exim4_auth_tls: false
+exim4_tls_cert: []
+exim4_tls_path: []
+exim4_tls_cert_path: []
+exim4_tls_key_path: []
+exim4_passwd: []
+
+# Example
+
+# exim4_passwd:
+#   - { username: test , password: test-password, comment: test-user }
+
+# exim4_dkim:
+#   - { file: "{{ lookup('file', 'dkim/example.com.key') }}", file_name: example.com.key }
+#   - { file: "{{ lookup('file', 'dkim/example.com.mail.txt') }}", file_name: example.com.mail.txt }
+
+# exim4_auth_tls: true
+
+# exim4_tls_cert:
+#   - { file: "{{ lookup('file', 'certificates_tls/example.com.pem') }}", file_name: example.com.crt }
+#   - { file: "{{ lookup('file', 'certificates_tls/example.com.key') }}", file_name: example.com.key }
+
+# exim4_tls_path: /etc/exim4/ssl
+# exim4_tls_cert_path: "{{ exim4_tls_path }}/example.com.crt"
+# exim4_tls_key_path: "{{ exim4_tls_path }}/example.com.key"
