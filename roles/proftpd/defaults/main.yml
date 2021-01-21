@@ -10,6 +10,7 @@ ftp_dir_path: /var/www/ftp/
 
 proftpd_ssh_host_rsa_key: []
 
+nat_mode: false
 
 #proftpd_users:
 #  - { username: 'example1', passwd_hash: '$1$QKW8OMFY$YRYOvvlyUHnXmJV9NqI8Q1' }
@@ -30,4 +31,3 @@ proftpd_ssh_host_rsa_key: []
 #    WY6FOAvyiRiQc33rhKjU73ZgIgMtq3V0xj8wDtOo2xa9+0nCTPZyuezUd/2BxiPC
 #    9ugU3BIWeE2BT1Bqvq48oPi2f+xxsQASdWOcQ5xv4gBapr5XlFP69WlJ5M0rnbrk
 #    aM0tLA9ZkZJQT6NAfYWhLHelim0f8NU6sPawM9ZtHgSOQ5pb
-

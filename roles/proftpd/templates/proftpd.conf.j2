@@ -112,6 +112,12 @@ Group				nogroup
 # (such as xinetd)
 MaxInstances			40
 PassivePorts 50000 60000
+{% endraw %}
+{% if nat_mode is defined and nat_mode == 'true' %}
+MasqueradeAddress {{ ansible_host }}
+{% endif %}
+{% raw %}
+
 # Disable sendfile by default since it breaks displaying the download speeds in
 # ftptop and ftpwho
 UseSendfile			off
